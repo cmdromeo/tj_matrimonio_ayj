@@ -101,7 +101,8 @@ button{font:inherit}
 .cover.opening .cover-center{opacity:0;transform:scale(1.08)}
 .cover.opening .seal{transform:scale(1.4);opacity:0}
 .cover.opening .seam{opacity:0}
-.cover.opening{pointer-events:none}
+.cover.opening,.cover.opening *{pointer-events:none!important}
+[hidden]{display:none!important}
 
 /* =============== INVITATION SHEET =============== */
 .sheet{position:relative;max-width:620px;margin:0 auto;background:var(--sheet);
@@ -204,6 +205,7 @@ footer small{display:block;margin-top:22px;font-family:var(--f-label);font-size:
 .js .rv{transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
 .js .rv.pre{opacity:0;transform:translateY(22px)}
 
+@media (hover:none),(pointer:coarse){body{background-attachment:scroll}.flora.tr,.flora.bl{animation:none}}
 @media (max-width:480px){
   .venue{padding-bottom:64px}
   .venue .map-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -420,7 +422,7 @@ footer small{display:block;margin-top:22px;font-family:var(--f-label);font-size:
     cover.classList.add("opening");
     document.body.classList.add("opened");
     musicBtn.hidden = false;
-    setTimeout(function(){ cover.hidden = true; root.classList.remove("locked"); startReveal(); }, reduce ? 50 : 1650);
+    setTimeout(function(){ cover.hidden = true; cover.style.display = "none"; if(cover.parentNode) cover.parentNode.removeChild(cover); root.classList.remove("locked"); startReveal(); }, reduce ? 50 : 1650);
     if(!reduce) startPetals();
   }
   cover.addEventListener("click", openCard);
@@ -449,7 +451,7 @@ footer small{display:block;margin-top:22px;font-family:var(--f-label);font-size:
   /* ---- falling petals ---- */
   function startPetals(){
     var c = document.getElementById("petals"), ctx = c.getContext("2d");
-    var dpr = Math.min(window.devicePixelRatio||1, 2), W, H, petals = [], t0 = performance.now();
+    var dpr = Math.min(window.devicePixelRatio||1, 1.5), W, H, petals = [], t0 = performance.now();
     function size(){ W = c.clientWidth; H = c.clientHeight; c.width = W*dpr; c.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
     size(); addEventListener("resize", size);
     var colors = ["#BCD5EC","#D6E6F5","#FFFFFF","#E9DEC6","#A9C8E6"];
@@ -459,11 +461,12 @@ footer small{display:block;margin-top:22px;font-family:var(--f-label);font-size:
         rot: Math.random()*6.28, vr: -.02 + Math.random()*.04, sway: Math.random()*6.28,
         col: colors[(Math.random()*colors.length)|0], a: .55 + Math.random()*.35 };
     }
-    for(var i=0;i<26;i++) petals.push(make(true));
+    for(var i=0;i<18;i++) petals.push(make(true));
     function frame(now){
       var elapsed = (now - t0)/1000;
       ctx.clearRect(0,0,W,H);
-      var target = elapsed < 7 ? 26 : 12;
+      var target = elapsed < 7 ? 18 : (elapsed < 14 ? 8 : 0);
+      if(elapsed > 14 && !petals.length){ ctx.clearRect(0,0,W,H); c.style.display = "none"; return; }
       for(var i=petals.length-1;i>=0;i--){
         var p = petals[i];
         p.sway += .02; p.x += p.vx + Math.sin(p.sway)*.5; p.y += p.vy; p.rot += p.vr;
@@ -481,4 +484,3 @@ footer small{display:block;margin-top:22px;font-family:var(--f-label);font-size:
 
 </body>
 </html>
-
